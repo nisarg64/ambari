@@ -22,7 +22,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.sun.jersey.api.client.*;
 import org.apache.ambari.server.configuration.Configuration;
+import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
@@ -63,7 +65,15 @@ public class AmbariErrorHandlerTest {
 
     server.start();
 
+    /*
+
+    Code being commented out for a test migration to Jetty 9
+    
     int localPort = server.getConnectors()[0].getLocalPort();
+
+    */
+    Connector connector = server.getConnectors()[0];
+    int localPort = ((ServerConnector)connector).getLocalPort();
 
     Client client = new Client();
     WebResource resource = client.resource("http://localhost:" + localPort + "/");
