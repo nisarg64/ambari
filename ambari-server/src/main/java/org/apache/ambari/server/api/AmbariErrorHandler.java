@@ -25,7 +25,7 @@ import org.apache.ambari.server.configuration.Configuration;
 import org.apache.ambari.server.security.authorization.jwt.JwtAuthenticationProperties;
 import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.http.MimeTypes;
-import org.eclipse.jetty.server.AbstractHttpConnection;
+import org.eclipse.jetty.server.HttpConnection;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.ErrorHandler;
 
@@ -50,15 +50,18 @@ public class AmbariErrorHandler extends ErrorHandler {
 
   @Override
   public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
-    AbstractHttpConnection connection = AbstractHttpConnection.getCurrentConnection();
-    connection.getRequest().setHandled(true);
 
-    response.setContentType(MimeTypes.TEXT_PLAIN);
+
+    HttpConnection connection = HttpConnection.getCurrentConnection();
+    connection.getHttpChannel().getRequest().setHandled(true);
+    response.setContentType(String.valueOf(MimeTypes.Type.TEXT_PLAIN));
 
     Map<String, Object> errorMap = new LinkedHashMap<String, Object>();
-    int code = connection.getResponse().getStatus();
+
+    int code = connection.getHttpChannel().getResponse().getStatus();
     errorMap.put("status", code);
-    String message = connection.getResponse().getReason();
+
+    String message = connection.getHttpChannel().getResponse().getReason();
     if (message == null) {
       message = HttpStatus.getMessage(code);
     }
